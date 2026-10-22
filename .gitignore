@@ -1,2 +1,7 @@
 /models/*
 /venv/*
+build/
+dist/
+*.egg-info/
+/mlruns/*
+*.csv/

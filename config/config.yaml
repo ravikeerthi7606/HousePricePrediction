@@ -1,0 +1,24 @@
+
+project:
+  name: house-price-prediction
+  random_state: 42
+
+data:
+  path: data/AmesHousing.csv
+  target: SalePrice
+  drop_columns:
+    - Order
+    - PID
+
+training:
+  test_size: 0.15
+  validation_size: 0.15
+
+model:
+  name: GradientBoostingRegressor
+  params:
+    n_estimators: 100
+    max_depth: 5
+    min_samples_split: 2
+    learning_rate: 0.1
+    subsample: 1.0
