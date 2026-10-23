@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 
-from config_loader import (
+from src.HousePrice.config_loader import (
     load_config,
     PROJECT_ROOT,
 )
