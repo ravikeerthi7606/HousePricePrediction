@@ -6,7 +6,7 @@ from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
 from HousePrice.predict import load_model, predict_price
-
+from HousePrice.request_schema import HousePriceRequest
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -33,11 +33,33 @@ def health(request: Request):
     }
 
 
+# @app.post("/predict", response_model=PredictionResponse)
+# def predict(payload: dict, request: Request):
+#     try:
+#         price = predict_price(
+#             payload,
+#             model=request.app.state.model,
+#         )
+
+#         if not np.isfinite(price):
+#             raise ValueError("Prediction is not finite.")
+
+#         return {"predicted_price": price}
+
+#     except (TypeError, ValueError) as exc:
+#         raise HTTPException(
+#             status_code=422,
+#             detail=str(exc),
+#         ) from exc
+
+
 @app.post("/predict", response_model=PredictionResponse)
-def predict(payload: dict, request: Request):
+def predict(payload: HousePriceRequest, request: Request):
     try:
+        input_data = payload.model_dump()
+
         price = predict_price(
-            payload,
+            input_data,
             model=request.app.state.model,
         )
 
