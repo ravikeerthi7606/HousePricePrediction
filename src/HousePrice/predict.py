@@ -4,7 +4,7 @@ from pathlib import Path
 import joblib
 import pandas as pd
 
-from src.HousePrice.config_loader import PROJECT_ROOT
+from HousePrice.config_loader import PROJECT_ROOT
 
 
 MODEL_PATH = PROJECT_ROOT / "models" / "house_price_pipeline.joblib"
