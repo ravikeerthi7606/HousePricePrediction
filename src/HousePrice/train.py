@@ -140,10 +140,10 @@ def main():
     )
 
     # 4. Configure artifact path
-    model_dir = PROJECT_ROOT / "models"
-    model_dir.mkdir(parents=True, exist_ok=True)
+    # model_dir = PROJECT_ROOT / "models"
+    # model_dir.mkdir(parents=True, exist_ok=True)
 
-    model_path = model_dir / "house_price_pipeline.joblib"
+    # model_path = model_dir / "house_price_pipeline.joblib"
 
     # 5. Configure MLflow
     tracking_dir = PROJECT_ROOT / "mlruns"
@@ -177,6 +177,15 @@ def main():
             y_val,
             val_predictions,
         )
+
+        run_id = run.info.run_id
+
+        model_dir = PROJECT_ROOT / "models" / run_id
+        model_dir.mkdir(parents=True, exist_ok=False)
+
+        model_path = model_dir / "pipeline.joblib"
+        metadata_path = model_dir / "metadata.json"
+
 
         logger.info("Validation metrics: %s", val_metrics)
 
@@ -236,7 +245,7 @@ def main():
             }
 
         metadata = {
-            "run_id": run.info.run_id,
+            "run_id": run_id,
             "model_name": model_config["name"],
             "random_state": seed,
             "feature_columns": X_train.columns.tolist(),
@@ -257,6 +266,11 @@ def main():
             "w", encoding="utf-8"
         ) as file:
             json.dump(metadata, file, indent=4)
+
+        mlflow.log_artifact(
+            str(model_path),
+            artifact_path="model_files",
+        )
 
         mlflow.log_artifact(
             str(metadata_path),

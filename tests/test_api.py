@@ -57,3 +57,60 @@ def test_wrong_json_structure():
         response = client.post("/predict", json=[1, 2, 3])
 
     assert response.status_code == 422
+
+
+
+def test_batch_prediction():
+    payload = [get_payload(), get_payload()]
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/predict/batch",
+            json=payload,
+        )
+
+    assert response.status_code == 200
+
+    predictions = response.json()["predictions"]
+
+    assert len(predictions) == 2
+    assert all(
+        item["predicted_price"] > 0
+        for item in predictions
+    )
+
+
+def test_empty_batch():
+    with TestClient(app) as client:
+        response = client.post(
+            "/predict/batch",
+            json=[],
+        )
+
+    assert response.status_code == 422
+
+
+def test_batch_size_limit():
+    payload = [get_payload() for _ in range(101)]
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/predict/batch",
+            json=payload,
+        )
+
+    assert response.status_code == 422
+
+
+def test_batch_rejects_missing_feature():
+    payload = get_payload()
+    payload.pop(next(iter(payload)))
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/predict/batch",
+            json=[payload],
+        )
+
+    assert response.status_code == 422
+

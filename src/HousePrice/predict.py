@@ -1,30 +1,43 @@
 
 from pathlib import Path
 
+import os
 import joblib
 import pandas as pd
 
 from HousePrice.config_loader import PROJECT_ROOT
+from HousePrice.artifacts import load_artifacts
 
 
 MODEL_PATH = PROJECT_ROOT / "models" / "house_price_pipeline.joblib"
 
 
-def load_model(model_path=MODEL_PATH):
-    """Load the trained sklearn pipeline."""
-    model_path = Path(model_path)
+def load_model():
+    run_id = os.getenv("HOUSE_PRICE_MODEL_VERSION")
 
-    if not model_path.exists():
-        raise FileNotFoundError(
-            f"Model artifact not found: {model_path}"
+    if not run_id:
+        raise RuntimeError(
+            "HOUSE_PRICE_MODEL_VERSION is not configured."
         )
 
-    pipeline = joblib.load(model_path)
-
-    if not hasattr(pipeline, "predict"):
-        raise TypeError("Loaded artifact is not a prediction model.")
+    pipeline, metadata = load_artifacts(run_id)
 
     return pipeline
+# def load_model(model_path=MODEL_PATH):
+#     """Load the trained sklearn pipeline."""
+#     model_path = Path(model_path)
+
+#     if not model_path.exists():
+#         raise FileNotFoundError(
+#             f"Model artifact not found: {model_path}"
+#         )
+
+#     pipeline = joblib.load(model_path)
+
+#     if not hasattr(pipeline, "predict"):
+#         raise TypeError("Loaded artifact is not a prediction model.")
+
+#     return pipeline
 
 
 def predict_price(input_data, model=None):
