@@ -6,6 +6,7 @@ import joblib
 import mlflow
 import mlflow.sklearn
 import numpy as np
+import pandas as pd
 
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import (
@@ -16,7 +17,7 @@ from sklearn.metrics import (
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 
-from src.HousePrice.config_loader import (
+from HousePrice.config_loader import (
     load_config,
     PROJECT_ROOT,
 )
@@ -208,12 +209,38 @@ def main():
             artifact_path="model_files",
         )
 
-        # Record basic training metadata
+        # Record basic training metadata     
+        feature_schema = {}
+
+        for column in X_train.columns:
+            dtype = X_train[column].dtype
+
+            if pd.api.types.is_numeric_dtype(dtype):
+                feature_type = "numeric"
+            elif pd.api.types.is_object_dtype(dtype) or (
+                pd.api.types.is_string_dtype(dtype)
+                and not pd.api.types.is_numeric_dtype(dtype)
+            ) or pd.api.types.is_categorical_dtype(dtype) or (
+                pd.api.types.is_bool_dtype(dtype)
+            ):
+                feature_type = "categorical"
+            else:
+                raise TypeError(
+                    f"Unsupported feature type: {column} ({dtype})"
+                )
+
+            feature_schema[column] = {
+                "type": feature_type,
+                "dtype": str(dtype),
+                "nullable": True,
+            }
+
         metadata = {
             "run_id": run.info.run_id,
             "model_name": model_config["name"],
             "random_state": seed,
             "feature_columns": X_train.columns.tolist(),
+            "feature_schema": feature_schema,
             "target_column": config["data"]["target"],
             "validation_metrics": val_metrics,
             "split_sizes": {
@@ -222,6 +249,7 @@ def main():
                 "test": len(X_test),
             },
         }
+
 
         metadata_path = model_dir / "metadata.json"
 
