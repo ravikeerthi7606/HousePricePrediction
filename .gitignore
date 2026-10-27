@@ -1,3 +1,4 @@
+# DIRECTORY
 /models/*
 /venv/*
 build/
@@ -5,5 +6,31 @@ dist/
 *.egg-info/
 /mlruns/*
 *.csv/
-.env
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
 get_mlflow_run_id.py
+
+# Virtual environments
+venv/
+.venv/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
