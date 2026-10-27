@@ -13,12 +13,8 @@ MODEL_PATH = PROJECT_ROOT / "models" / "house_price_pipeline.joblib"
 
 
 def load_model():
-    run_id = os.getenv("HOUSE_PRICE_MODEL_VERSION")
-
-    if not run_id:
-        raise RuntimeError(
-            "HOUSE_PRICE_MODEL_VERSION is not configured."
-        )
+    # run_id = os.getenv("HOUSE_PRICE_MODEL_VERSION")
+    run_id = '2dc83fac14bf4e278d593d126899d7a3'
 
     pipeline, metadata = load_artifacts(run_id)
 
